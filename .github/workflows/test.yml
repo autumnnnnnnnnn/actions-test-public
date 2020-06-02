@@ -1,0 +1,38 @@
+name: testExercice2
+on:
+  pull_request:
+    branches: [master]
+jobs:
+  read_today's_repo:
+    runs-on: ubuntu-latest
+    steps:
+      - uses:
+  test_pull_request:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v1
+        with:
+          node-version: 13
+      - run: npm ci
+      - run: npm run testStats && jq .stats.passPercent mochawesome-report/mochawesome.json
+  gsheet:
+    runs-on: ubuntu-latest
+    needs: test_pull_request
+    steps:
+      - id: "read"
+        uses: jroehl/gsheet.action@v1.0.0
+        with:
+          spreadsheetId: ${{ secrets.TEST_SPREADSHEET_ID }}
+          commands: |
+            [
+              { "command": "getWorksheet", "args": { "worksheetTitle": "Sheet1" }},
+              { "command": "getData", "args": { "worksheetTitle": "Sheet1", "minCol": 3, "minRow": 2, "maxCol": 3, "maxRow": 2} }           ]
+        env:
+          GSHEET_CLIENT_EMAIL: ${{ secrets.GSHEET_CLIENT_EMAIL }}
+          GSHEET_PRIVATE_KEY: ${{ secrets.GSHEET_PRIVATE_KEY }}
+      - name: dump Results
+        env:
+          RESULTS: ${{ steps.read.outputs.results }}
+        run: |
+          echo "$RESULTS" | jq --raw-output ".results"
