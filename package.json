@@ -1,10 +1,10 @@
 {
-	"name": "gitHub-Actions-test",
+	"name": "gitHub-Actions-test-tets",
 	"version": "1.0.0",
 	"description": "",
 	"main": "index.js",
 	"scripts": {
-		"test": "mocha exercice.test.js ",
+		"test": "mocha test test exercice.test.js ",
 		"testStats": "mocha exercice.test.js --reporter mochawesome || true"
 	},
 	"keywords": [],
